@@ -1,22 +1,39 @@
 <template>
-  <header class="site-header" ref="siteHeader">
-    <div class="site-header__top">
-      <action-button :onClick="handleCartClick">
-        <img src="~/assets/icons/cart.svg" />
-      </action-button>
-      <img src="~/assets/revel-office-logo.svg" />
-      <action-button :onClick="handleNavClick">
-        <img src="~/assets/icons/menu.svg" />
-      </action-button>
-    </div>
+  <div class="site-header__wrapper" :class="{ 'header-open': open }">
+    <header
+      class="site-header"
+      ref="siteHeader"
+      data-expanding="nil"
+      data-active="nav"
+    >
+      <div class="site-header__top">
+        <action-button :onClick="handleCartClick">
+          <img src="~/assets/icons/cart.svg" />
+        </action-button>
+        <img src="~/assets/revel-office-logo.svg" />
+        <action-button :onClick="handleNavClick">
+          <img src="~/assets/icons/menu.svg" />
+        </action-button>
+      </div>
 
-    <!-- <Transition @beforeEnter="storeHeaderState" @onEnter="animateHeader"> -->
-    <SiteNav ref="siteNavRef" />
-    <!-- </Transition> -->
-    <!-- <Transition @onEnter="animateHeader"> -->
-    <Cart ref="cartRef" />
-    <!-- </Transition> -->
-  </header>
+      <div class="site-header__bottom">
+        <SiteNav ref="siteNavRef" />
+        <Cart ref="cartRef" />
+
+        <div class="bottom__button-container">
+          <action-button
+            class="nav__button animate-nav-item"
+            :style="{ 'transition-delay': `${siteLinks.length * 0.02}s` }"
+            variant="primary"
+          >
+            {{ mode === "nav" ? "Create Account" : "Checkout" }}
+          </action-button>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrapper__backdrop" @click="closeHeader"></div>
+  </div>
 </template>
 
 <script>
@@ -49,7 +66,8 @@ export default {
         { text: "Contact", path: "/", available: true },
       ],
       cartItems: [],
-      state: null,
+      headerState: null,
+      headerLastHeight: 0,
     };
   },
   methods: {
@@ -60,9 +78,13 @@ export default {
       this.animateFromHeaderState();
     },
     handleCartClick() {
+      this.storeHeaderState();
       this.cartEl.style.display = "";
       this.navEl.style.display = "none";
       if (this.open && this.mode === "nav") {
+        this.headerEl.dataset.expanding =
+          this.headerEl.clientHeight > this.headerLastHeight;
+        this.animateFromHeaderState();
       } else {
         this.toggleMenu();
       }
@@ -73,34 +95,30 @@ export default {
       this.cartEl.style.display = "none";
       this.navEl.style.display = "";
       if (this.open && this.mode === "cart") {
+        this.headerEl.dataset.expanding =
+          this.headerEl.clientHeight > this.headerLastHeight;
         this.animateFromHeaderState();
       } else {
         this.toggleMenu();
       }
       this.mode = "nav";
     },
-    openCart() {
-      this.mode = "cart";
-      this.toggleMenu();
-    },
-    switchToNav() {
-      this.mode = "nav";
-    },
-    openNav() {
-      // this.mode = "nav";
-      this.toggleMenu();
-    },
-    switchToCart() {
-      this.mode = "cart";
-    },
     storeHeaderState() {
-      this.state = Flip.getState(this.$refs.siteHeader);
+      this.headerState = Flip.getState(this.$refs.siteHeader);
+      this.headerLastHeight = this.headerEl.clientHeight;
     },
     openHeader() {
       this.$refs.siteHeader.classList.toggle("open");
     },
     animateFromHeaderState() {
-      Flip.from(this.state, { duration: 0.5, ease: "power4.out" });
+      Flip.from(this.headerState, { duration: 0.5, ease: "power4.out" });
+    },
+    closeHeader() {
+      if (this.mode === "nav") {
+        this.handleNavClick();
+      } else if (this.mode === "cart") {
+        this.handleCartClick();
+      }
     },
   },
   computed: {
@@ -110,12 +128,51 @@ export default {
     navEl() {
       return this.$refs?.siteNavRef?.navEl;
     },
+    headerEl() {
+      return this.$refs.siteHeader;
+    },
+  },
+  watch: {
+    mode: {
+      handler(newValue) {
+        if (this.headerEl) {
+          this.headerEl.dataset.active = newValue;
+        }
+      },
+    },
   },
 };
 </script>
 
 <style lang="pcss">
 @import "~/styles/index.pcss";
+
+.site-header__wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  /* bottom: 0; */
+  padding: 16px;
+  z-index: 1;
+}
+
+.wrapper__backdrop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+}
+
+.header-open .wrapper__backdrop {
+  display: block;
+}
+
+.header-open {
+  bottom: 0;
+}
 
 .site-header {
   background-color: white;
@@ -129,6 +186,8 @@ export default {
   grid-template-rows: 3.125rem 0;
   max-width: 31.25rem;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .site-header__top {
@@ -148,5 +207,34 @@ export default {
   padding: 0.25rem;
   display: flex;
   flex-direction: column;
+}
+
+.site-header__bottom {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 49px;
+  margin-top: auto;
+}
+
+.bottom__button-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 0.25rem 0.25rem 0.25rem;
+  margin-top: auto;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.site-header.open .bottom__button-container {
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 1s;
+}
+
+.nav__button {
+  margin-top: 0.313rem;
 }
 </style>

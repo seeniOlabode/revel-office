@@ -1,15 +1,21 @@
 <template>
   <div class="app">
     <site-header />
+    <site-shop />
+    <site-footer />
   </div>
 </template>
 
 <script>
 import SiteHeader from "./components/header/SiteHeader.vue";
+import SiteShop from "./components/shop/Shop.vue";
+import SiteFooter from "./components/footer/SiteFooter.vue";
 
 export default {
   components: {
     SiteHeader,
+    SiteShop,
+    SiteFooter,
   },
   setup() {
     useHead({
@@ -48,6 +54,14 @@ body {
 .app {
   @add-mixin absolute-screen;
   padding: 16px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+@media screen and (min-width: 992px) {
+  .app {
+    padding: 40px;
+  }
 }
 
 .action-button {

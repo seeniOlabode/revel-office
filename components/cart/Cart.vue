@@ -2,10 +2,13 @@
   <div class="site-header__cart site-header__section" ref="cartEl">
     <ul class="cart__items-list">
       <li
-        v-for="i in 10"
+        v-for="i in 2"
         :key="i"
         class="cart__item animate-cart-item"
-        :style="{ 'transition-delay': `${i * 0.015}s` }"
+        :style="{
+          '--delay': `${i * 0.015}s`,
+          '--negative-delay': `${(2 - i) * 0.015}s`,
+        }"
       >
         <span class="item__thumbnail">
           <img src="~/assets/chairs/herman-miller-aeron.png" />
@@ -19,13 +22,6 @@
         <QualityControl class="details__quantity-control" />
       </li>
     </ul>
-    <action-button
-      :style="{ 'transition-delay': `${cartItems.length * 0.02}s` }"
-      class="nav__button animate-cart-item"
-      variant="primary"
-    >
-      Checkout
-    </action-button>
   </div>
 </template>
 
@@ -33,10 +29,12 @@
 import { ref } from "vue";
 
 import ActionButton from "../shared/ActionButton.vue";
+import QualityControl from "../shared/QualityControl.vue";
 
 export default {
   components: {
     ActionButton,
+    QualityControl,
   },
   expose: ["cartEl"],
   setup() {
@@ -116,5 +114,46 @@ export default {
 .details__quantity-control {
   margin-left: auto;
   margin-right: 10px;
+}
+
+.site-header.open .animate-cart-item {
+  opacity: 1;
+  transform: translateY(0px);
+  pointer-events: all;
+}
+
+.animate-cart-item {
+  opacity: 0;
+  transition: opacity var(--md-speed), transform var(--md-speed);
+  transform: translateY(-1.25rem);
+  pointer-events: none;
+}
+
+.site-header.open[data-expanding="true"] .site-header__cart {
+  --transition-from: 1.25rem;
+}
+
+.site-header.open[data-expanding="false"] .site-header__cart {
+  --transition-from: -1.25rem;
+}
+
+.site-header.open[data-expanding="true"] .site-header__cart .animate-cart-item {
+  transition-delay: var(--negative-delay);
+}
+
+.site-header.open[data-expanding="false"]
+  .site-header__cart
+  .animate-cart-item {
+  transition-delay: var(--delay);
+}
+
+.site-header.open:not([data-active="cart"]) .animate-cart-item {
+  opacity: 0;
+  transform: translateY(var(--transition-from));
+}
+
+.site-header.open[data-active="cart"] .animate-cart-item {
+  opacity: 1;
+  transform: translate(0);
 }
 </style>

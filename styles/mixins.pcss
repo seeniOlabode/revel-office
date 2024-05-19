@@ -26,3 +26,9 @@
   list-style: none;
   padding: 0;
 }
+
+@define-mixin container {
+  background-color: white;
+  border-radius: var(--lg-radius);
+  @add-mixin border;
+}

@@ -5,6 +5,8 @@
   --very-dark-grey: #323238;
   --grey: #8a8a8a;
   --stroke: #ebebeb;
+  --text-grey: #4c4d51;
+  --dark-fade: #5c5c62;
 
   --lg-radius: 12px;
   --sm-radius: 8px;
@@ -13,4 +15,12 @@
   --sm-speed: 300ms;
   --md-speed: 400ms;
   --lg-speed: 500ms;
+
+  --xs-spacing: 10px;
+  --sm-spacing: 16px;
+  --lg-spacing: 40px;
+
+  --xs-font: 10px;
+  --sm-font: 12px;
+  --base-font: 16px;
 }

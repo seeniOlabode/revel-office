@@ -5,7 +5,10 @@
         class="nav__item animate-nav-item"
         v-for="(link, i) in siteLinks"
         :key="link.text + link.path"
-        :style="{ 'transition-delay': `${i * 0.015}s` }"
+        :style="{
+          '--delay': `${i * 0.015}s`,
+          '--negative-delay': `${(siteLinks.length - i) * 0.015}s`,
+        }"
       >
         {{ link.text }}
         <span v-if="!link.available" class="item__availability">
@@ -16,13 +19,6 @@
         </span>
       </li>
     </ul>
-    <action-button
-      class="nav__button animate-nav-item"
-      :style="{ 'transition-delay': `${siteLinks.length * 0.02}s` }"
-      variant="primary"
-    >
-      Create Account
-    </action-button>
   </nav>
 </template>
 
@@ -107,8 +103,34 @@ export default {
 
 .animate-nav-item {
   opacity: 0;
-  transition: opacity var(--md-speed), transform var(--md-speed);
+  transition: opacity var(--sm-speed), transform var(--sm-speed);
   transform: translateY(-1.25rem);
   pointer-events: none;
+}
+
+.site-header.open[data-expanding="true"] .site-header__nav {
+  --transition-from: 1.25rem;
+}
+
+.site-header.open[data-expanding="false"] .site-header__nav {
+  --transition-from: -1.25rem;
+}
+
+.site-header.open[data-expanding="true"] .site-header__nav .animate-nav-item {
+  transition-delay: var(--negative-delay);
+}
+
+.site-header.open[data-expanding="false"] .site-header__nav .animate-nav-item {
+  transition-delay: var(--delay);
+}
+
+.site-header.open:not([data-active="nav"]) .animate-nav-item {
+  opacity: 0;
+  transform: translateY(var(--transition-from));
+}
+
+.site-header.open[data-active="nav"] .animate-nav-item {
+  opacity: 1;
+  transform: translate(0);
 }
 </style>
