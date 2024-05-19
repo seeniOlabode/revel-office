@@ -1,0 +1,16 @@
+:root {
+  --light-grey: #f6f6f8;
+  --faded-grey: #eeeef3;
+  --dark-grey: #45464a;
+  --very-dark-grey: #323238;
+  --grey: #8a8a8a;
+  --stroke: #ebebeb;
+
+  --lg-radius: 12px;
+  --sm-radius: 8px;
+
+  --xs-speed: 200ms;
+  --sm-speed: 300ms;
+  --md-speed: 400ms;
+  --lg-speed: 500ms;
+}
