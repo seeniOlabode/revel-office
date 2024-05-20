@@ -25,10 +25,20 @@
 
 <script>
 import ProductsList from "./ProductsList.vue";
+import { gsap } from "gsap";
 
 export default {
   components: {
     ProductsList,
+  },
+  mounted() {
+    gsap.from(".site-shop__intro", {
+      opacity: 0,
+      duration: 0.6,
+      y: 100,
+      scale: 0.8,
+      ease: "power2.inOut",
+    });
   },
 };
 </script>
@@ -42,12 +52,13 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 50px;
+  padding-bottom: 100px;
 }
 
 .site-shop__intro {
   @add-mixin container;
   padding: var(--xs-spacing);
+  transform-origin: 50% 100%;
 }
 
 .site-shop__search {

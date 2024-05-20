@@ -15,6 +15,7 @@
   --sm-speed: 300ms;
   --md-speed: 400ms;
   --lg-speed: 500ms;
+  --xl-speed: 1s;
 
   --xs-spacing: 10px;
   --sm-spacing: 16px;
@@ -22,5 +23,6 @@
 
   --xs-font: 10px;
   --sm-font: 12px;
+  --x-base-font: 14px;
   --base-font: 16px;
 }

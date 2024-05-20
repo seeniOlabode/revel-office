@@ -1,8 +1,9 @@
 <template>
-  <div class="app">
+  <div class="app" ref="appEl" style="visibility: hidden">
     <site-header />
-    <site-shop />
+    <site-shop v-if="loaded" />
     <site-footer />
+    <!-- <site-preloader /> -->
   </div>
 </template>
 
@@ -10,16 +11,18 @@
 import SiteHeader from "./components/header/SiteHeader.vue";
 import SiteShop from "./components/shop/Shop.vue";
 import SiteFooter from "./components/footer/SiteFooter.vue";
+import SitePreloader from "./components/SitePreloader.vue";
 
 export default {
   components: {
     SiteHeader,
     SiteShop,
     SiteFooter,
+    SitePreloader,
   },
   setup() {
     useHead({
-      title: "Muzen",
+      title: "Revel Office",
       htmlAttrs: {
         lang: "en",
       },
@@ -37,9 +40,25 @@ export default {
           href: "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap",
           rel: "stylesheet",
         },
+        {
+          href: "/revel-office-favicon.png",
+          type: "image/png",
+          rel: "icon",
+        },
       ],
       script: [],
     });
+  },
+  data() {
+    return {
+      loaded: false,
+    };
+  },
+  mounted() {
+    this.$refs.appEl.style.visibility = "visible";
+    setTimeout(() => {
+      this.loaded = true;
+    }, 500);
   },
 };
 </script>
@@ -49,6 +68,10 @@ export default {
 
 body {
   background-color: var(--light-grey);
+}
+
+.fouc-hidden {
+  visibility: hidden;
 }
 
 .app {

@@ -16,20 +16,36 @@
         </action-button>
       </div>
 
-      <div class="site-header__bottom">
+      <div class="site-header__bottom" ref="headerBottomEl">
         <SiteNav ref="siteNavRef" />
         <Cart ref="cartRef" />
 
         <div class="bottom__button-container">
-          <action-button
-            class="nav__button animate-nav-item"
-            :style="{ 'transition-delay': `${siteLinks.length * 0.02}s` }"
-            variant="primary"
-          >
+          <action-button class="nav__button animate-nav-item" variant="primary">
             {{ mode === "nav" ? "Create Account" : "Checkout" }}
           </action-button>
         </div>
       </div>
+
+      <!-- <div
+        class="site-header__notifications"
+        ref="notificationsEl"
+        style="display: none"
+      >
+        <div class="scroll-prompt">
+          <span class="scroll-prompt__text">
+            Keep scrolling to reveal footer
+          </span>
+          <span class="scroll-prompt__icon">
+            <span class="scroll-prompt__icons-wrapper">
+              <img src="~/assets/icons/chevrons-down.svg" />
+              <img src="~/assets/icons/chevrons-down.svg" />
+            </span>
+          </span>
+        </div>
+
+        <span class="backdrop"></span>
+      </div> -->
     </header>
 
     <div class="wrapper__backdrop" @click="closeHeader"></div>
@@ -40,8 +56,10 @@
 import { gsap } from "gsap";
 
 import { Flip } from "gsap/Flip";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(Flip);
+gsap.registerPlugin(ScrollTrigger);
 
 import QualityControl from "../shared/QualityControl.vue";
 import ActionButton from "../shared/ActionButton.vue";
@@ -71,6 +89,14 @@ export default {
     };
   },
   methods: {
+    toggleNotification() {
+      this.storeHeaderState();
+      this.$refs.notificationsEl.style.display = "";
+      this.$refs.headerBottomEl.style.display = "none";
+      this.headerEl.classList.toggle("open");
+      this.animateFromHeaderState();
+      this.mode = "notification";
+    },
     toggleMenu() {
       this.open = !this.open;
       this.storeHeaderState();
@@ -140,6 +166,18 @@ export default {
         }
       },
     },
+  },
+  mounted() {
+    // ScrollTrigger.create({
+    //   trigger: ".site-shop",
+    //   start: "bottom 101%",
+    //   onEnter: function () {
+    //     this.toggleNotification();
+    //   }.bind(this),
+    //   onLeaveBack: function () {
+    //     this.toggleNotification();
+    //   }.bind(this),
+    // });
   },
 };
 </script>
@@ -236,5 +274,65 @@ export default {
 
 .nav__button {
   margin-top: 0.313rem;
+}
+
+.site-header__notifications {
+  position: relative;
+}
+
+.site-header__notifications .backdrop {
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  background-color: red;
+  top: 0;
+  bottom: 0;
+  background-color: var(--very-dark-grey);
+}
+
+.scroll-prompt {
+  position: relative;
+  z-index: 1;
+  padding: var(--sm-spacing) var(--sm-spacing);
+  border-top: solid 1px var(--stroke);
+  background-color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform var(--md-speed);
+  justify-content: space-between;
+  text-transform: uppercase;
+  /* background-color: var(--very-dark-grey); */
+}
+
+.scroll-prompt__icon {
+  height: 18px;
+  overflow: hidden;
+}
+
+.scroll-prompt__icons-wrapper {
+  animation: scroll-animation infinite var(--xl-speed);
+  display: block;
+}
+
+.scroll-prompt__icon img {
+  height: 18px;
+}
+
+.scroll-prompt__text {
+  color: var(--dark-fade);
+  font-size: var(--sm-font);
+  font-weight: 600;
+  /* color: white; */
+}
+
+@keyframes scroll-animation {
+  from {
+    transform: translateY(-50%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
 }
 </style>

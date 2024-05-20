@@ -1,11 +1,19 @@
 <template>
   <ul class="site-shop__products-list">
-    <ChairCard v-for="i in 20" :key="i" />
+    <ChairCard
+      v-for="chair in store.chairs"
+      :key="chair.name"
+      :chairData="chair"
+    />
   </ul>
 </template>
 
 <script>
 import ChairCard from "./ChairCard.vue";
+
+import useStore from "~/store";
+
+import { gsap } from "gsap";
 
 export default {
   components: {
@@ -15,6 +23,37 @@ export default {
     return {
       chairs: [],
     };
+  },
+  setup() {
+    const store = useStore();
+
+    return {
+      store,
+    };
+  },
+
+  mounted() {
+    this.animateChairsIn();
+  },
+
+  methods: {
+    animateChairsIn() {
+      gsap.from(".site-chair-card", {
+        opacity: 0,
+        duration: 0.5,
+        y: 100,
+        scale: 0.8,
+        ease: "power2.inOut",
+        delay: 0.15,
+        stagger: {
+          each: 0.1,
+          from: "start",
+          grid: "auto",
+          axis: "y",
+          ease: "linear",
+        },
+      });
+    },
   },
 };
 </script>

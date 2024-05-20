@@ -1,12 +1,15 @@
 <template>
   <div class="site-chair-card">
-    <div class="site-chair-card__top">
-      <img class="top__image" src="" />
-    </div>
+    <div
+      class="site-chair-card__top"
+      :style="{
+        '--chair-image': `url('/images/chairs/${chairData.slug}.png')`,
+      }"
+    ></div>
     <div class="site-chair-card__bottom">
       <div class="bottom__details">
-        <h3 class="bottom__title">Herman Miller Aeron</h3>
-        <span class="bottom__price">189 USD</span>
+        <h3 class="bottom__title">{{ chairData.name }}</h3>
+        <span class="bottom__price">{{ chairData.price }} USD</span>
       </div>
       <action-button class="site-chair-card__add" variant="icon bg mini">
         <img src="~/assets/icons/cart.svg" />
@@ -21,6 +24,16 @@ import ActionButton from "../shared/ActionButton.vue";
 export default {
   components: {
     ActionButton,
+  },
+  props: {
+    chairData: {
+      type: Object,
+      default: {
+        name: "Herman Miller Aeron",
+        price: 189,
+        slug: "herman-miller-aeron",
+      },
+    },
   },
 };
 </script>
@@ -37,6 +50,7 @@ export default {
   overflow: hidden;
   display: grid;
   grid-template-rows: 1fr auto;
+  transform-origin: 50% 100%;
 }
 
 .site-chair-card__bottom {
@@ -73,7 +87,7 @@ export default {
 .site-chair-card__top {
   height: 100%;
   width: 100%;
-  background-image: url(~/assets/chairs/herman-miller-aeron.png);
+  background-image: var(--chair-image);
   background-repeat: no-repeat;
   background-size: 50%;
   background-position: 40% center;
@@ -91,9 +105,15 @@ export default {
 }
 
 @media screen and (min-width: 576px) {
+  .bottom__title {
+    font-size: var(--x-base-font);
+  }
   .site-chair-card__bottom {
     padding: 10px 0 0 0;
   }
+}
+
+@media screen and (min-width: 992px) {
   .bottom__title {
     font-size: var(--base-font);
   }

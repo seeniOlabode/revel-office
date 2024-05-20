@@ -6,12 +6,12 @@
         :key="i"
         class="cart__item animate-cart-item"
         :style="{
-          '--delay': `${i * 0.015}s`,
-          '--negative-delay': `${(2 - i) * 0.015}s`,
+          '--delay': `${i * 0.025}s`,
+          '--negative-delay': `${(2 - i) * 0.025}s`,
         }"
       >
         <span class="item__thumbnail">
-          <img src="~/assets/chairs/herman-miller-aeron.png" />
+          <img src="/images/chairs/herman-miller-aeron.png" />
         </span>
 
         <span class="item__details">
