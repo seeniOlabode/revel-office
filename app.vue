@@ -1,6 +1,6 @@
 <template>
   <div class="app" ref="appEl" style="visibility: hidden">
-    <site-header />
+    <site-header ref="siteHeader" />
     <site-shop v-if="loaded" />
     <site-footer />
     <!-- <site-preloader /> -->
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { computed } from "vue";
+
 import SiteHeader from "./components/header/SiteHeader.vue";
 import SiteShop from "./components/shop/Shop.vue";
 import SiteFooter from "./components/footer/SiteFooter.vue";
@@ -19,6 +21,11 @@ export default {
     SiteShop,
     SiteFooter,
     SitePreloader,
+  },
+  provide() {
+    return {
+      getNotify: () => computed(() => this?.siteHeader?.notify),
+    };
   },
   setup() {
     useHead({

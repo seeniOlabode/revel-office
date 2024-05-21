@@ -2,8 +2,8 @@
   <div class="site-header__cart site-header__section" ref="cartEl">
     <ul class="cart__items-list">
       <li
-        v-for="i in 2"
-        :key="i"
+        v-for="(item, i) in cartItems"
+        :key="item.id"
         class="cart__item animate-cart-item"
         :style="{
           '--delay': `${i * 0.025}s`,
@@ -11,15 +11,21 @@
         }"
       >
         <span class="item__thumbnail">
-          <img src="/images/chairs/herman-miller-aeron.png" />
+          <img :src="`/images/chairs/${item.slug}.png`" />
         </span>
 
         <span class="item__details">
-          <span class="details__name">Herman Miller Aeron</span>
-          <span class="detail__price">$249</span>
+          <span class="details__name">{{ item.name }}</span>
+          <span class="detail__price">${{ item.price }}</span>
         </span>
 
-        <QualityControl class="details__quantity-control" />
+        <QualityControl
+          class="details__quantity-control"
+          :quantity="item.quantity"
+          :onDecrement="decrement"
+          :onIncrement="increment"
+          :index="i"
+        />
       </li>
     </ul>
   </div>
@@ -31,6 +37,8 @@ import { ref } from "vue";
 import ActionButton from "../shared/ActionButton.vue";
 import QualityControl from "../shared/QualityControl.vue";
 
+import useStore from "~/store";
+
 export default {
   components: {
     ActionButton,
@@ -39,13 +47,22 @@ export default {
   expose: ["cartEl"],
   setup() {
     const cartEl = ref(null);
+    const store = useStore();
 
-    return { cartEl };
+    return { cartEl, store };
   },
-  data() {
-    return {
-      cartItems: [],
-    };
+  computed: {
+    cartItems() {
+      return this.store.cart;
+    },
+  },
+  methods: {
+    decrement(index) {
+      this.store.decrementQuantityInCart(index);
+    },
+    increment(index) {
+      this.store.incrementQuantityInCart(index);
+    },
   },
 };
 </script>
@@ -59,7 +76,7 @@ export default {
   flex-direction: column;
   height: fit-content;
   max-height: 300px;
-  /* overflow: scroll; */
+  overflow: scroll;
 }
 
 .cart__item {

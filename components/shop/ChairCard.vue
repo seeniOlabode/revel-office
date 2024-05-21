@@ -11,7 +11,11 @@
         <h3 class="bottom__title">{{ chairData.name }}</h3>
         <span class="bottom__price">{{ chairData.price }} USD</span>
       </div>
-      <action-button class="site-chair-card__add" variant="icon bg mini">
+      <action-button
+        :onClick="addToCart"
+        class="site-chair-card__add"
+        variant="icon bg mini"
+      >
         <img src="~/assets/icons/cart.svg" />
       </action-button>
     </div>
@@ -21,10 +25,13 @@
 <script>
 import ActionButton from "../shared/ActionButton.vue";
 
+import useStore from "~/store";
+
 export default {
   components: {
     ActionButton,
   },
+  inject: ["getNotify"],
   props: {
     chairData: {
       type: Object,
@@ -33,6 +40,26 @@ export default {
         price: 189,
         slug: "herman-miller-aeron",
       },
+    },
+  },
+  setup() {
+    const store = useStore();
+
+    return {
+      store,
+    };
+  },
+  methods: {
+    addToCart() {
+      this.store.addToCart(this.chairData);
+      this.notify("Item added to cart");
+    },
+    removeFromCart() {
+      this.store.removeFromCart(this.chairData.id);
+      this.notify("Item removed from cart");
+    },
+    notify(text) {
+      this.getNotify()(text);
     },
   },
 };

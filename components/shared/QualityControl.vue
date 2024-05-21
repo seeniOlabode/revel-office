@@ -1,10 +1,10 @@
 <template>
   <div class="quantity-control">
-    <button class="quantity-control__button" @click="decrement">
+    <button class="quantity-control__button" @click="() => onDecrement(index)">
       <img src="~/assets/icons/minus.svg" />
     </button>
     <span class="quantity-control__value">{{ quantity }}</span>
-    <button class="quantity-control__button" @click="increment">
+    <button class="quantity-control__button" @click="() => onIncrement(index)">
       <img src="~/assets/icons/add.svg" />
     </button>
   </div>
@@ -12,19 +12,22 @@
 
 <script>
 export default {
-  data() {
-    return {
-      quantity: 1,
-    };
-  },
-  methods: {
-    increment() {
-      this.quantity = this.quantity + 1;
+  props: {
+    quantity: {
+      type: Number,
+      required: true,
     },
-    decrement() {
-      this.quantity = this.quantity > 0 ? this.quantity - 1 : this.quantity;
+    onIncrement: {
+      type: Function,
+    },
+    onDecrement: {
+      type: Function,
+    },
+    index: {
+      type: Number,
     },
   },
+  methods: {},
 };
 </script>
 

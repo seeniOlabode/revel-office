@@ -27,25 +27,19 @@
         </div>
       </div>
 
-      <!-- <div
+      <div
         class="site-header__notifications"
         ref="notificationsEl"
         style="display: none"
       >
         <div class="scroll-prompt">
           <span class="scroll-prompt__text">
-            Keep scrolling to reveal footer
-          </span>
-          <span class="scroll-prompt__icon">
-            <span class="scroll-prompt__icons-wrapper">
-              <img src="~/assets/icons/chevrons-down.svg" />
-              <img src="~/assets/icons/chevrons-down.svg" />
-            </span>
+            {{ notificationText }}
           </span>
         </div>
 
         <span class="backdrop"></span>
-      </div> -->
+      </div>
     </header>
 
     <div class="wrapper__backdrop" @click="closeHeader"></div>
@@ -73,6 +67,7 @@ export default {
     Cart,
     SiteNav,
   },
+  // expose: ["notify"],
   data() {
     return {
       open: false,
@@ -86,6 +81,7 @@ export default {
       cartItems: [],
       headerState: null,
       headerLastHeight: 0,
+      notificationText: "",
     };
   },
   methods: {
@@ -145,6 +141,10 @@ export default {
       } else if (this.mode === "cart") {
         this.handleCartClick();
       }
+    },
+    notify(text) {
+      this.notificationText = text;
+      this.toggleNotification();
     },
   },
   computed: {
