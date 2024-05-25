@@ -11,6 +11,9 @@ const useStore = defineStore("site-store", {
   }),
   actions: {
     addToCart(chair) {
+      if (this.cart.findIndex((cartChair) => chair.id == cartChair.id) !== -1) {
+        return chair.quantity++;
+      }
       this.cart.push(chair);
       chair.inCart = true;
       chair.quantity = 1;

@@ -1,6 +1,6 @@
 <template>
   <nav class="site-header__nav site-header__section" ref="navEl">
-    <ul class="nav__list">
+    <ul class="nav__list" ref="navListEl">
       <li
         class="nav__item animate-nav-item"
         v-for="(link, i) in siteLinks"
@@ -19,22 +19,50 @@
         </span>
       </li>
     </ul>
+
+    <form
+      class="site-header__auth-form"
+      style="display: none"
+      onsubmit="return false"
+      method="POST"
+      ref="authFormEl"
+    >
+      <text-input
+        placeholder="Your name"
+        style="--delay: 0s; --negative-delay: 0.025s"
+        class="animate-nav-item"
+      />
+      <text-input
+        placeholder="Your email"
+        style="--delay: 0.025s; --negative-delay: 0s"
+        class="animate-nav-item"
+      />
+    </form>
   </nav>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, defineExpose } from "vue";
 
 import ActionButton from "../shared/ActionButton.vue";
+
+import TextInput from "../shared/TextInput.vue";
 
 export default {
   components: {
     ActionButton,
+    TextInput,
   },
-  expose: ["navEl"],
+  props: {
+    showAuth: Boolean,
+  },
+  emits: ["storeState", "animateState"],
   setup() {
     const navEl = ref(null);
-
+    console.log(defineExpose);
+    defineExpose({
+      navEl: navEl,
+    });
     return { navEl };
   },
   data() {
@@ -46,6 +74,21 @@ export default {
         { text: "Contact", path: "/", available: true },
       ],
     };
+  },
+  watch: {
+    showAuth: {
+      handler(value) {
+        if (value) {
+          this.$emit("storeState");
+          this.$refs.authFormEl.style.display = "";
+          this.$refs.navListEl.style.display = "none";
+          this.$emit("animateState");
+        } else {
+          this.$refs.authFormEl.style.display = "none";
+          this.$refs.navListEl.style.display = "";
+        }
+      },
+    },
   },
 };
 </script>
@@ -108,11 +151,11 @@ export default {
   pointer-events: none;
 }
 
-.site-header.open[data-expanding="true"] .site-header__nav {
+.site-header.open:not([data-expanding="false"]) .site-header__nav {
   --transition-from: 1.25rem;
 }
 
-.site-header.open[data-expanding="false"] .site-header__nav {
+.site-header.open:not([data-expanding="true"]) .site-header__nav {
   --transition-from: -1.25rem;
 }
 
@@ -132,5 +175,11 @@ export default {
 .site-header.open[data-active="nav"] .animate-nav-item {
   opacity: 1;
   transform: translate(0);
+}
+
+.site-header__auth-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
 }
 </style>

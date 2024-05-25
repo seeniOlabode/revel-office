@@ -1,6 +1,6 @@
 <template>
   <div class="site-header__cart site-header__section" ref="cartEl">
-    <ul class="cart__items-list">
+    <ul class="cart__items-list" v-show="cartItems.length > 0">
       <li
         v-for="(item, i) in cartItems"
         :key="item.id"
@@ -28,11 +28,20 @@
         />
       </li>
     </ul>
+
+    <div
+      class="empty-cart-state animate-cart-item"
+      v-show="cartItems.length === 0"
+    >
+      <span class="empty-cart-state__text">
+        You have no items in cart, yet.
+      </span>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, defineExpose } from "vue";
 
 import ActionButton from "../shared/ActionButton.vue";
 import QualityControl from "../shared/QualityControl.vue";
@@ -44,10 +53,13 @@ export default {
     ActionButton,
     QualityControl,
   },
-  expose: ["cartEl"],
   setup() {
     const cartEl = ref(null);
     const store = useStore();
+
+    defineExpose({
+      cartEl: cartEl,
+    });
 
     return { cartEl, store };
   },
@@ -76,7 +88,7 @@ export default {
   flex-direction: column;
   height: fit-content;
   max-height: 300px;
-  overflow: scroll;
+  /* overflow: scroll; */
 }
 
 .cart__item {
@@ -146,11 +158,11 @@ export default {
   pointer-events: none;
 }
 
-.site-header.open[data-expanding="true"] .site-header__cart {
+.site-header.open:not([data-expanding="false"]) .site-header__cart {
   --transition-from: 1.25rem;
 }
 
-.site-header.open[data-expanding="false"] .site-header__cart {
+.site-header.open:not([data-expanding="true"]) .site-header__cart {
   --transition-from: -1.25rem;
 }
 
@@ -172,5 +184,20 @@ export default {
 .site-header.open[data-active="cart"] .animate-cart-item {
   opacity: 1;
   transform: translate(0);
+}
+
+.empty-cart-state {
+  font-size: 14px;
+  color: var(--grey);
+  padding: 10px;
+  border: solid 1px var(--stroke);
+  border-radius: var(--sm-radius);
+}
+
+.empty-cart-state__text {
+  color: var(--dark-grey);
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.9;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="app" ref="appEl" style="visibility: hidden">
     <site-header ref="siteHeader" />
     <site-shop v-if="loaded" />
-    <site-footer />
+    <!-- <site-footer /> -->
     <!-- <site-preloader /> -->
   </div>
 </template>

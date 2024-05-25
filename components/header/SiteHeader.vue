@@ -1,52 +1,48 @@
 <template>
-  <div class="site-header__wrapper" :class="{ 'header-open': open }">
+  <div
+    class="site-header__wrapper"
+    :class="{ 'header-open': headerCurrentState !== 'closed' }"
+  >
     <header
       class="site-header"
-      ref="siteHeader"
+      ref="headerEl"
       data-expanding="nil"
       data-active="nav"
     >
       <div class="site-header__top">
-        <action-button :onClick="handleCartClick">
+        <action-button :onClick="() => handleHeaderEvent('clickCart')">
           <img src="~/assets/icons/cart.svg" />
         </action-button>
         <img src="~/assets/revel-office-logo.svg" />
-        <action-button :onClick="handleNavClick">
+        <action-button :onClick="() => handleHeaderEvent('clickNav')">
           <img src="~/assets/icons/menu.svg" />
         </action-button>
       </div>
 
       <div class="site-header__bottom" ref="headerBottomEl">
-        <SiteNav ref="siteNavRef" />
+        <SiteNav ref="navRef" :showAuth="false" />
         <Cart ref="cartRef" />
 
         <div class="bottom__button-container">
           <action-button class="nav__button animate-nav-item" variant="primary">
-            {{ mode === "nav" ? "Create Account" : "Checkout" }}
+            {{
+              headerCurrentState === "navOpen" ? "Create Account" : "Checkout"
+            }}
           </action-button>
         </div>
       </div>
-
-      <div
-        class="site-header__notifications"
-        ref="notificationsEl"
-        style="display: none"
-      >
-        <div class="scroll-prompt">
-          <span class="scroll-prompt__text">
-            {{ notificationText }}
-          </span>
-        </div>
-
-        <span class="backdrop"></span>
-      </div>
     </header>
 
-    <div class="wrapper__backdrop" @click="closeHeader"></div>
+    <div
+      class="wrapper__backdrop"
+      @click="() => handleHeaderEvent('clickClose')"
+    ></div>
   </div>
 </template>
 
 <script>
+import { ref } from "vue";
+
 import { gsap } from "gsap";
 
 import { Flip } from "gsap/Flip";
@@ -60,6 +56,8 @@ import ActionButton from "../shared/ActionButton.vue";
 import Cart from "../cart/Cart.vue";
 import SiteNav from "./SiteNav.vue";
 
+import StateMachine from "~/utils/StateMachine";
+
 export default {
   components: {
     QualityControl,
@@ -68,6 +66,104 @@ export default {
     SiteNav,
   },
   // expose: ["notify"],
+  setup() {
+    // elementRefs
+    const headerEl = ref(null);
+    const headerBottomEl = ref(null);
+    const cartRef = ref(null);
+    const navRef = ref(null);
+
+    // state
+    let lastHeaderHeight = 0;
+    let headerSnapshot = null;
+
+    // methods
+    function updateHeaderSnapshot() {
+      headerSnapshot = Flip.getState(headerEl.value);
+      lastHeaderHeight = headerEl.value.clientHeight;
+    }
+
+    function setupElementDisplays(nextState) {
+      cartRef.value.cartEl.style.display =
+        nextState === "cartOpen" ? "" : "none";
+      navRef.value.navEl.style.display = nextState === "navOpen" ? "" : "none";
+    }
+
+    function setupActiveDataSet(nextState) {
+      headerEl.value.dataset.active = { navOpen: "nav", cartOpen: "cart" }[
+        nextState
+      ];
+    }
+
+    function isHeaderExpanding() {
+      headerEl.value.dataset.expanding =
+        headerEl.value.clientHeight > lastHeaderHeight;
+    }
+
+    function animateHeaderFromSnapShot() {
+      Flip.from(headerSnapshot, { duration: 0.5, ease: "power4.out" });
+    }
+
+    function beforeHeaderTransition({ currentState, nextState }) {
+      updateHeaderSnapshot();
+      setupElementDisplays(nextState);
+      if (currentState === "closed" || nextState === "closed") {
+        toggleHeader();
+      }
+      isHeaderExpanding();
+      setupActiveDataSet(nextState);
+    }
+
+    function afterHeaderTransition({ currentState, nextState }) {
+      animateHeaderFromSnapShot();
+    }
+
+    function toggleHeader() {
+      headerEl.value.classList.toggle("open");
+    }
+
+    function handleHeaderEvent(event) {
+      headerStateMachine.transition(event);
+    }
+
+    // state
+    const headerTransitions = {
+      closed: {
+        clickNav: "navOpen",
+        clickCart: "cartOpen",
+      },
+      navOpen: {
+        clickClose: "closed",
+        clickCart: "cartOpen",
+        clickNav: "closed",
+      },
+      cartOpen: {
+        clickClose: "closed",
+        clickCart: "closed",
+        clickNav: "navOpen",
+      },
+    };
+
+    const headerStateMachine = new StateMachine({
+      initialState: "closed",
+      transitions: headerTransitions,
+      _before: beforeHeaderTransition,
+      _after: afterHeaderTransition,
+    });
+
+    const headerCurrentState = headerStateMachine.getStateRef();
+
+    return {
+      // ref elements
+      headerEl,
+      headerBottomEl,
+      cartRef,
+      navRef,
+      headerCurrentState,
+
+      handleHeaderEvent,
+    };
+  },
   data() {
     return {
       open: false,
@@ -78,106 +174,7 @@ export default {
         { text: "Collection", path: "/", available: false },
         { text: "Contact", path: "/", available: true },
       ],
-      cartItems: [],
-      headerState: null,
-      headerLastHeight: 0,
-      notificationText: "",
     };
-  },
-  methods: {
-    toggleNotification() {
-      this.storeHeaderState();
-      this.$refs.notificationsEl.style.display = "";
-      this.$refs.headerBottomEl.style.display = "none";
-      this.headerEl.classList.toggle("open");
-      this.animateFromHeaderState();
-      this.mode = "notification";
-    },
-    toggleMenu() {
-      this.open = !this.open;
-      this.storeHeaderState();
-      this.openHeader();
-      this.animateFromHeaderState();
-    },
-    handleCartClick() {
-      this.storeHeaderState();
-      this.cartEl.style.display = "";
-      this.navEl.style.display = "none";
-      if (this.open && this.mode === "nav") {
-        this.headerEl.dataset.expanding =
-          this.headerEl.clientHeight > this.headerLastHeight;
-        this.animateFromHeaderState();
-      } else {
-        this.toggleMenu();
-      }
-      this.mode = "cart";
-    },
-    handleNavClick() {
-      this.storeHeaderState();
-      this.cartEl.style.display = "none";
-      this.navEl.style.display = "";
-      if (this.open && this.mode === "cart") {
-        this.headerEl.dataset.expanding =
-          this.headerEl.clientHeight > this.headerLastHeight;
-        this.animateFromHeaderState();
-      } else {
-        this.toggleMenu();
-      }
-      this.mode = "nav";
-    },
-    storeHeaderState() {
-      this.headerState = Flip.getState(this.$refs.siteHeader);
-      this.headerLastHeight = this.headerEl.clientHeight;
-    },
-    openHeader() {
-      this.$refs.siteHeader.classList.toggle("open");
-    },
-    animateFromHeaderState() {
-      Flip.from(this.headerState, { duration: 0.5, ease: "power4.out" });
-    },
-    closeHeader() {
-      if (this.mode === "nav") {
-        this.handleNavClick();
-      } else if (this.mode === "cart") {
-        this.handleCartClick();
-      }
-    },
-    notify(text) {
-      this.notificationText = text;
-      this.toggleNotification();
-    },
-  },
-  computed: {
-    cartEl() {
-      return this.$refs?.cartRef?.cartEl;
-    },
-    navEl() {
-      return this.$refs?.siteNavRef?.navEl;
-    },
-    headerEl() {
-      return this.$refs.siteHeader;
-    },
-  },
-  watch: {
-    mode: {
-      handler(newValue) {
-        if (this.headerEl) {
-          this.headerEl.dataset.active = newValue;
-        }
-      },
-    },
-  },
-  mounted() {
-    // ScrollTrigger.create({
-    //   trigger: ".site-shop",
-    //   start: "bottom 101%",
-    //   onEnter: function () {
-    //     this.toggleNotification();
-    //   }.bind(this),
-    //   onLeaveBack: function () {
-    //     this.toggleNotification();
-    //   }.bind(this),
-    // });
   },
 };
 </script>
@@ -274,65 +271,5 @@ export default {
 
 .nav__button {
   margin-top: 0.313rem;
-}
-
-.site-header__notifications {
-  position: relative;
-}
-
-.site-header__notifications .backdrop {
-  position: absolute;
-  left: -5px;
-  right: -5px;
-  background-color: red;
-  top: 0;
-  bottom: 0;
-  background-color: var(--very-dark-grey);
-}
-
-.scroll-prompt {
-  position: relative;
-  z-index: 1;
-  padding: var(--sm-spacing) var(--sm-spacing);
-  border-top: solid 1px var(--stroke);
-  background-color: white;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: transform var(--md-speed);
-  justify-content: space-between;
-  text-transform: uppercase;
-  /* background-color: var(--very-dark-grey); */
-}
-
-.scroll-prompt__icon {
-  height: 18px;
-  overflow: hidden;
-}
-
-.scroll-prompt__icons-wrapper {
-  animation: scroll-animation infinite var(--xl-speed);
-  display: block;
-}
-
-.scroll-prompt__icon img {
-  height: 18px;
-}
-
-.scroll-prompt__text {
-  color: var(--dark-fade);
-  font-size: var(--sm-font);
-  font-weight: 600;
-  /* color: white; */
-}
-
-@keyframes scroll-animation {
-  from {
-    transform: translateY(-50%);
-  }
-
-  to {
-    transform: translateY(0%);
-  }
 }
 </style>
