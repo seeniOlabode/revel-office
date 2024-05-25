@@ -65,7 +65,6 @@ export default {
     Cart,
     SiteNav,
   },
-  // expose: ["notify"],
   setup() {
     // elementRefs
     const headerEl = ref(null);
@@ -161,13 +160,12 @@ export default {
       navRef,
       headerCurrentState,
 
+      // methods
       handleHeaderEvent,
     };
   },
   data() {
     return {
-      open: false,
-      mode: "nav",
       siteLinks: [
         { text: "Shop", path: "/", available: true },
         { text: "Track Orders", path: "/", available: false },
