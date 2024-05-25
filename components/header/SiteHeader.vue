@@ -146,8 +146,8 @@ export default {
     const headerStateMachine = new StateMachine({
       initialState: "closed",
       transitions: headerTransitions,
-      _before: beforeHeaderTransition,
-      _after: afterHeaderTransition,
+      beforeTransition: beforeHeaderTransition,
+      afterTransition: afterHeaderTransition,
     });
 
     const headerCurrentState = headerStateMachine.getStateRef();

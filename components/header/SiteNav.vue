@@ -59,7 +59,6 @@ export default {
   emits: ["storeState", "animateState"],
   setup() {
     const navEl = ref(null);
-    console.log(defineExpose);
     defineExpose({
       navEl: navEl,
     });

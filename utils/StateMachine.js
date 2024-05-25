@@ -1,11 +1,16 @@
 import { ref } from "vue";
 
 class StateMachine {
-  constructor({ initialState, transitions, _before, _after }) {
+  constructor({
+    initialState,
+    transitions,
+    beforeTransition,
+    afterTransition,
+  }) {
     this.state = ref(initialState);
     this.transitions = transitions;
-    this._before = _before;
-    this._after = _after;
+    this.beforeTransition = beforeTransition;
+    this.afterTransition = afterTransition;
   }
 
   getStateRef() {
@@ -13,12 +18,13 @@ class StateMachine {
   }
 
   transition(event) {
+    const currentState = this.state.value;
     const nextState = this.transitions[this.state.value]?.[event];
     if (nextState) {
-      this.runActionsBefore(this.state.value, nextState);
+      this.runHook("beforeTransition", currentState, nextState);
       this.state.value = nextState;
-      this.runActionsAfter(this.state.value, nextState);
-      console.log(`Transitioned to ${this.state.value}`);
+      this.runHook("afterTransition", currentState, nextState);
+      console.log(`Transitioned from ${currentState} to ${nextState}`);
     } else {
       console.log(
         `No transition available from state ${this.state.value} on event ${event}`
@@ -26,24 +32,14 @@ class StateMachine {
     }
   }
 
-  runActionsBefore(currentState, nextState) {
-    if (this._before) {
-      this._before({ currentState, nextState });
+  runHook(hookType, currentState, nextState) {
+    if (this[hookType]) {
+      this[hookType]({ currentState, nextState });
     }
-    if (this.transitions[currentState]?._before) {
-      this.transitions[currentState]._before({
-        currentState,
-        nextState,
-      });
-    }
-  }
 
-  runActionsAfter(currentState, nextState) {
-    if (this._after) {
-      this._after({ currentState, nextState });
-    }
-    if (this.transitions[currentState]?._after) {
-      this.transitions[currentState]._after({ currentState, nextState });
+    const stateHook = this.transitions[currentState]?.[hookType];
+    if (stateHook) {
+      stateHook({ currentState, nextState });
     }
   }
 }

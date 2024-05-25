@@ -54,7 +54,7 @@ export default {
 }
 
 .site-button.primary:hover {
-  /* opacity: 0.2; */
+  opacity: 0.95;
 }
 
 .site-button.icon {
