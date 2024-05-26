@@ -158,10 +158,10 @@ export default {
       headerBottomEl,
       cartRef,
       navRef,
+      handleHeaderEvent,
       headerCurrentState,
 
       // methods
-      handleHeaderEvent,
     };
   },
   data() {
@@ -173,6 +173,11 @@ export default {
         { text: "Contact", path: "/", available: true },
       ],
     };
+  },
+  methods: {
+    handleME() {
+      console.log("me");
+    },
   },
 };
 </script>
@@ -187,7 +192,7 @@ export default {
   top: 0;
   /* bottom: 0; */
   padding: 16px;
-  z-index: 1;
+  z-index: 20;
 }
 
 .wrapper__backdrop {

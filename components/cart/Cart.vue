@@ -88,7 +88,7 @@ export default {
   flex-direction: column;
   height: fit-content;
   max-height: 300px;
-  /* overflow: scroll; */
+  overflow: auto;
 }
 
 .cart__item {

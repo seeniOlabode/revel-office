@@ -4,6 +4,7 @@
     <site-shop v-if="loaded" />
     <!-- <site-footer /> -->
     <!-- <site-preloader /> -->
+    <toast-manager />
   </div>
 </template>
 
@@ -15,12 +16,15 @@ import SiteShop from "./components/shop/Shop.vue";
 import SiteFooter from "./components/footer/SiteFooter.vue";
 import SitePreloader from "./components/SitePreloader.vue";
 
+import ToastManager from "./components/toast/ToastManager.vue";
+
 export default {
   components: {
     SiteHeader,
     SiteShop,
     SiteFooter,
     SitePreloader,
+    ToastManager,
   },
   provide() {
     return {

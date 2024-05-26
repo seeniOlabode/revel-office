@@ -19,7 +19,7 @@ class StateMachine {
 
   transition(event) {
     const currentState = this.state.value;
-    const nextState = this.transitions[this.state.value]?.[event];
+    const nextState = this.transitions?.[this.state.value]?.[event];
     if (nextState) {
       this.runHook("beforeTransition", currentState, nextState);
       this.state.value = nextState;

@@ -1,5 +1,5 @@
 <template>
-  <button class="site-button" :class="variant" @click="onClick">
+  <button class="site-button" :class="[variant, { active }]" @click="onClick">
     <slot></slot>
   </button>
 </template>
@@ -16,6 +16,10 @@ export default {
       default: function () {
         console.log("Clicked");
       },
+    },
+    active: {
+      type: Boolean,
+      default: false,
     },
   },
 };
@@ -53,14 +57,45 @@ export default {
   border-radius: 6px;
 }
 
+.site-button.primary.compact {
+  width: fit-content;
+  padding: 0 10px;
+  height: 25px;
+  max-height: 25px;
+  min-height: unset;
+  background-color: rgba(50, 50, 56, 1);
+  color: var(--faded-grey);
+}
+
 .site-button.primary:hover {
   opacity: 0.95;
+}
+
+.site-button.secondary {
+  text-align: left;
+  justify-content: start;
+  border: solid 1px var(--stroke);
+  padding: 0 10px;
+  padding: 5px;
+  border-radius: 6px;
+  min-height: unset;
+  font-size: 10px;
+  color: var(--text-grey);
+  /* background-color: var(--light-grey); */
+}
+
+.site-button.secondary:hover {
+  color: var(--very-dark-grey);
 }
 
 .site-button.icon {
   aspect-ratio: 1;
   border-radius: var(--sm-radius);
   height: 2.5rem;
+}
+
+.site-button.icon.active {
+  background-color: var(--dark-fade) !important;
 }
 
 .site-button.icon.mini {
